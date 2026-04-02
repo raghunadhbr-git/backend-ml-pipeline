@@ -1,0 +1,45 @@
+name: ML Recommendation Pipeline
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "30 22 * * *"   # 4 AM IST
+
+jobs:
+  run-ml-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Checkout
+      - name: 📦 Checkout
+        uses: actions/checkout@v3
+
+      # Python
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      # Install
+      - name: 📚 Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pandas sqlalchemy psycopg2-binary
+
+      # Debug (VERY IMPORTANT)
+      - name: 📂 Debug Files
+        run: |
+          echo "FILES:"
+          ls -R
+
+      # Run pipeline
+      - name: 🚀 Run Pipeline
+        env:
+          EVENTS_DB_URL: ${{ secrets.EVENTS_DB_URL }}
+          PRODUCT_DB_URL: ${{ secrets.PRODUCT_DB_URL }}
+          RECO_DB_URL: ${{ secrets.RECO_DB_URL }}
+        run: |
+          echo "🚀 Running pipeline..."
+          python pipeline/run_pipeline.py

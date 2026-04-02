@@ -1,52 +1,42 @@
-# =====================================================
-# WORKFLOW NAME
-# =====================================================
 name: ML Recommendation Pipeline
 
 # =====================================================
-# TRIGGERS
+# TRIGGERS (ONLY MANUAL + CRON)
 # =====================================================
 on:
   workflow_dispatch:
 
-  # Runs daily at 4:00 AM IST (10:30 PM UTC)
   schedule:
-    - cron: "30 22 * * *"  # 10:30 PM UTC = 4:00 AM IST
-
-  push:
-    branches:
-      - main
+    - cron: "30 22 * * *"   # 4:00 AM IST
 
 # =====================================================
 # JOBS
 # =====================================================
 jobs:
   run-ml-pipeline:
-
-    # GitHub-hosted Ubuntu runner
     runs-on: ubuntu-latest
 
     steps:
 
-      # Step 1: Checkout code
-      - name: 📦 Checkout code
+      # Step 1: Checkout Code
+      - name: 📦 Checkout Code
         uses: actions/checkout@v3
 
       # Step 2: Setup Python
-      - name: 🐍 Setup Python 3.11
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      # Step 3: Install dependencies
-      - name: 📚 Install dependencies
+      # Step 3: Install Dependencies
+      - name: 📚 Install Dependencies
         run: |
-          echo "Installing dependencies..."
+          echo "📦 Installing dependencies..."
           pip install --upgrade pip
           pip install -r requirements.txt
-          echo "Dependencies installed"
+          echo "✅ Dependencies installed"
 
-      # Step 4: Run ML pipeline
+      # Step 4: Run ML Pipeline
       - name: 🚀 Run ML Pipeline
         env:
           EVENTS_DB_URL: ${{ secrets.EVENTS_DB_URL }}
@@ -57,6 +47,12 @@ jobs:
           MAIL_CC: ${{ secrets.MAIL_CC }}
         
         run: |
-          echo "Starting ML pipeline..."
+          echo "=============================="
+          echo "🚀 STARTING ML PIPELINE"
+          echo "=============================="
+
           python pipeline/run_pipeline.py
-          echo "Pipeline execution completed"
+
+          echo "=============================="
+          echo "✅ PIPELINE COMPLETED"
+          echo "=============================="
